@@ -1,4 +1,4 @@
-name: repobackup
+name: BackupHub
 channels:
   - defaults
 dependencies:
