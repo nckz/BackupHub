@@ -12,8 +12,8 @@ A cron-able script that will mirror all repositories of central git hub
 
 ## Crontab
 A weekly backup initiated by the cron at 3am each Saturday would look something
-like this:
+like this (assuming BackupHub.py is in your PATH):
 
 ```
-0 3 * * 6 ./BackupHub.py --path ~/backup --token <your-gitlab-api-token> --website http://gitlab.com --move-aside --ignore-errors >> ~/backup/BackupHub.log
+0 3 * * 6 BackupHub.py --path ~/backup --token <your-gitlab-api-token> --website http://gitlab.com --move-aside --ignore-errors >> ~/backup/BackupHub.log
 ```
