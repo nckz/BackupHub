@@ -7,16 +7,41 @@
 import os
 import sys
 import time
-import gitlab
+import gitlab # external GitLab API
+import github # external GitHub API
 import shutil
 import hashlib
 import optparse
 import subprocess
 
-class GitLabAPI:
+class GitWebsiteTypeAPI:
+    '''The abstract class to template each git-based website api.
+    '''
     def __init__(self, token, url):
         self._token = token
         self._url = url
+
+    def numProjects(self):
+        # return the number of projects
+        pass
+
+    def projectPath(self, index):
+        # return the full path for each project including group i.e.
+        #   <user/group-directory>/<repository-name>
+        # e.g.
+        #   nckz/BackupHub
+        pass
+
+    def projectURL(self, index):
+        # return the ssh-url that assumes ssh-keys have been distributed e.g.
+        #   git@git<lab/hub>.com:<user/group>/<repo-name>.git
+        # e.g.
+        #   git@github.com:nckz/BackupHub.git
+        pass
+
+class GitLabAPI(GitWebsiteTypeAPI):
+    def __init__(self, token, url):
+        GitWebsiteTypeAPI.__init__(self, token, url)
 
         # authenticate a gitlab session
         self._gl = gitlab.Gitlab(self._url, self._token)
@@ -34,6 +59,24 @@ class GitLabAPI:
     def projectURL(self, index):
         return self._projects[index].ssh_url_to_repo
 
+class GitHubAPI(GitWebsiteTypeAPI):
+    def __init__(self, token, url=''):
+        GitWebsiteTypeAPI.__init__(self, token, url)
+
+        # authenticate a gitlab session
+        self._gh = github.Github(self._token)
+
+        # list all projects
+        self._projects = self._gh.get_user().get_repos()
+
+    def numProjects(self):
+        return len([i for i in self._projects])
+
+    def projectPath(self, index):
+        return self._projects[index].full_name
+
+    def projectURL(self, index):
+        return self._projects[index].ssh_url
 
 class GitBareMirror:
     '''A simple git interface for managing bare-mirroed repos that backup url
@@ -142,6 +185,12 @@ if __name__ == '__main__':
     parser.add_option('--website', dest='website', action='store',
             type='string', default=None,
             help='The hub website where the git repos are stored.')
+    parser.add_option('--github', dest='github',
+            action='store_true', default=False,
+            help='Connect to GitHub.')
+    parser.add_option('--gitlab', dest='gitlab',
+            action='store_true', default=True,
+            help='Connect to GitLab (default).')
 
     options, args = parser.parse_args(sys.argv)
 
@@ -149,7 +198,12 @@ if __name__ == '__main__':
     print("BackupHub Start:", localtime)
 
     assert options.token is not None
-    assert options.website is not None
+
+    if options.github:
+        options.gitlab = False
+
+    if options.gitlab:
+        assert options.website is not None
 
     # Check for existing backup directory and make one if it doesn't exist.
     if not os.path.isdir(options.backupPath):
@@ -157,7 +211,10 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # Get the repository info from the git web api.
-    webapi = GitLabAPI(options.token, options.website)
+    if options.github:
+        webapi = GitHubAPI(options.token)
+    elif options.gitlab:
+        webapi = GitLabAPI(options.token, options.website)
 
     # Display whats going on as the repos get either updated or newly mirrored.
     print('Repository:')

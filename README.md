@@ -1,6 +1,6 @@
 # BackupHub
 A cron-able script that will mirror all repositories of central git hub
-(currently supports GitLab).
+(currently supports GitHub and GitLab).
 
 ## Requirements
 1. SSH keys deployed to the backup host machine.
@@ -11,9 +11,16 @@ A cron-able script that will mirror all repositories of central git hub
       for python dependencies
 
 ## Crontab
-A weekly backup initiated by the cron at 3am each Saturday would look something
-like this (assuming BackupHub.py is in your PATH):
+A weekly backup of your GitLab initiated by the cron at 3am each Saturday would
+look something like this (assuming BackupHub.py is in your PATH):
 
 ```
 0 3 * * 6 BackupHub.py --path ~/backup --token <your-gitlab-api-token> --website http://gitlab.com --move-aside --ignore-errors >> ~/backup/BackupHub.log
+```
+
+or for GitHub:
+
+
+```
+0 3 * * 6 BackupHub.py --path ~/backup --token <your-github-api-token> --move-aside --ignore-errors >> ~/backup/BackupHub.log
 ```

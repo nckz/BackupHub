@@ -5,3 +5,4 @@ dependencies:
   - python=3.5
   - pip:
     - python-gitlab==0.13
+    - PyGithub==1.26.0
