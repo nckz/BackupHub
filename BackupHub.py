@@ -6,6 +6,7 @@
 
 import os
 import sys
+import time
 import gitlab
 import shutil
 import hashlib
@@ -144,6 +145,9 @@ if __name__ == '__main__':
 
     options, args = parser.parse_args(sys.argv)
 
+    localtime = time.asctime( time.localtime(time.time()) )
+    print("BackupHub Start:", localtime)
+
     assert options.token is not None
     assert options.website is not None
 
@@ -169,3 +173,6 @@ if __name__ == '__main__':
                 print(err)
             else:
                 raise
+
+    localtime = time.asctime( time.localtime(time.time()) )
+    print("BackupHub Finished:", localtime)
