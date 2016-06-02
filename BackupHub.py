@@ -97,7 +97,8 @@ class GitBareMirror:
     def validExistingRepo(self):
 
         try:
-            assert os.path.isdir(self._path)
+            assert os.path.isdir(self._path), ('The supplied directory '
+                    'does not exist.')
 
             # move to the existing repo and check if its bare
             os.chdir(self._path)
@@ -106,13 +107,14 @@ class GitBareMirror:
             cmd.wait()
 
             # Error checking
-            assert cmd.returncode != 128, ('ERROR: The supplied directory '
+            assert cmd.returncode != 128, ('The supplied directory '
                     'exists, but is not a git repo.')
-            assert cmd.returncode == 0, 'ERROR: git error'
+            assert cmd.returncode == 0, 'There was an unhandled git error.'
             firstline = cmd.stdout.readlines()[0].decode('utf8')
-            assert 'false' not in firstline, ('ERROR: The supplied directory '
+            assert 'false' not in firstline, ('The supplied directory '
                     'is NOT a bare repo.')
-            assert 'true' in firstline
+            assert 'true' in firstline, ('Unable to verify that the repo is '
+                    'bare.')
 
             # check if the existing repo has the same origin url
             # -prevent name collision if group/org namespace isn't used
@@ -121,13 +123,13 @@ class GitBareMirror:
             cmd.wait()
             firstline = cmd.stdout.readlines()[0].decode('utf8')
 
-            assert self._origin_url in firstline, ('ERROR: The existing repo '
+            assert self._origin_url in firstline, ('The existing repo '
                     'has a url that differs from the supplied origin url.')
 
             return True
 
         except AssertionError as err:
-            print('Existing repo failed via:', err)
+            print('The given path does not contain a valid repo by:', err)
             return False
 
     def update(self):
