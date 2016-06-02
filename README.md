@@ -22,5 +22,5 @@ or for GitHub:
 
 
 ```
-0 3 * * 6 BackupHub.py --path ~/backup --token <your-github-api-token> --move-aside --ignore-errors >> ~/backup/BackupHub.log
+0 3 * * 6 BackupHub.py --path ~/backup --github --token <your-github-api-token> --move-aside --ignore-errors >> ~/backup/BackupHub.log
 ```
