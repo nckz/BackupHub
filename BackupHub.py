@@ -148,7 +148,7 @@ class GitBareMirror:
             parentPath = os.path.dirname(self._path)
             dirContents = str(os.listdir(parentPath)).encode('utf8')
             newNameExt = hashlib.md5(dirContents).hexdigest()
-            newName = self._path+'_'+newNameExt
+            newName = self._path+'_'+newNameExt+'_bu'
             print('MOVING PATH', self._path, newName)
             shutil.move(self._path, newName)
         elif self._overwrite and os.path.exists(self._path):
